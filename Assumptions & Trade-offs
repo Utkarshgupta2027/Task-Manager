@@ -1,0 +1,19 @@
+Assumptions
+Backend
+
+MySQL is running locally on the default port 3306 with the credentials defined in application.properties. In a real project these would be environment variables, not hardcoded.
+ddl-auto=update is used so Spring Boot auto-creates the tasks table on first run — this is fine for development but would be replaced with proper migrations (Flyway or Liquibase) in production.
+A single Task entity covers all needs. No user authentication or multi-user support was considered since the spec didn't ask for it.
+
+Frontend
+
+The Vite dev proxy (/api → localhost:8080) handles CORS during development. In production, you'd configure a real reverse proxy (Nginx) or update the CORS origin in the controller.
+Filter logic (All / Active / Completed) runs client-side since the task list is small. For large datasets you'd push filtering to the backend as a query parameter.
+
+Trade-offs
+For error handling, an @ExceptionHandler was placed directly inside the controller rather than creating a separate @ControllerAdvice class. A global handler is cleaner at scale, but with only 4 endpoints it would be unnecessary complexity for this exercise.
+Pagination was intentionally left out — the API returns all tasks in a single call. This keeps the code simple and is perfectly acceptable for a small dataset, but if the task list grew large, the backend would need Pageable support and the frontend would need to handle pages or infinite scroll.
+Lombok was included to eliminate boilerplate like getters, setters, and constructors. It makes the code significantly shorter and more readable, though it does add a compile-time dependency that some teams prefer to avoid in favor of writing explicit Java code.
+All task state is managed in App.jsx and passed down through props. This is easy to follow and perfectly fine for a single-page app of this size. If the app grew to multiple screens or needed shared state across unrelated components, the state would move to a React Context or a lightweight store like Zustand.
+Inline editing was implemented on double-click, keeping the UI minimal and the component self-contained with local draft state. The downside is discoverability — a user who doesn't know to double-click will never find the feature. A visible edit button would be more accessible, at the cost of a slightly busier UI.
+Finally, loading indicators were only added for the initial data fetch, not for individual actions like toggling or deleting. This makes interactions feel instant in normal conditions, but if the API is slow or a request fails silently, the user gets no feedback. Per-action loading states would improve the experience but add more state variables to manage in each component.
