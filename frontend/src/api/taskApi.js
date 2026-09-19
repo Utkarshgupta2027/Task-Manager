@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE = '/api/tasks';
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+const BASE = `${API_BASE_URL}/api/tasks`;
 
 export const fetchTasks    = ()           => axios.get(BASE);
 export const createTask    = (title)      => axios.post(BASE, { title });

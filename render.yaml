@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: task-manager-api
+    runtime: docker
+    dockerfilePath: ./task-manager/Dockerfile
+    dockerContext: ./task-manager
+    healthCheckPath: /api/health
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: JPA_SHOW_SQL
+        value: "false"
+
+  - type: web
+    name: task-manager-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: VITE_API_URL
+        sync: false
